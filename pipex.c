@@ -6,7 +6,7 @@
 /*   By: aleslie <aleslie@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/11 14:30:05 by aleslie           #+#    #+#             */
-/*   Updated: 2021/11/11 21:43:43 by aleslie          ###   ########.fr       */
+/*   Updated: 2021/11/11 21:49:20 by aleslie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,9 +67,9 @@ void	ft_child_process(int *pipe_fd, char **argv, char **env)
 		perror("File not found");
 		exit(0);
 	}
-	dup2(file1, 0); // ввод с файла
-	dup2(pipe_fd[1], 1); // вывод в начало трубы
-	close(pipe_fd[0]); // закрываем конец трубы
+	dup2(file1, 0); // Ввод с файла
+	dup2(pipe_fd[1], 1); // Вывод в начало трубы
+	close(pipe_fd[0]); // Закрываем конец трубы
 	path = ft_pars_var_environ(env); // Парсим переменное окружение
 	command = ft_split(argv[2], ' ');
 	all_file_path = ft_collecting_path_cmd(path, command[0]);
@@ -91,9 +91,9 @@ void	ft_parent_process(int *pipe_fd, char **argv, char **env)
 		perror("File not found");
 		exit(0);
 	}
-	dup2(pipe_fd[0], 0); // ввод с конца трубы
-	dup2(file2, 1); // вывод в файл
-	close(pipe_fd[1]); // закрываем начало трубы
+	dup2(pipe_fd[0], 0); // Ввод с конца трубы
+	dup2(file2, 1); // Вывод в файл
+	close(pipe_fd[1]); // Закрываем начало трубы
 	path = ft_pars_var_environ(env); // Парсим переменное окружение
 	command = ft_split(argv[3], ' ');
 	all_file_path = ft_collecting_path_cmd(path, command[0]);
