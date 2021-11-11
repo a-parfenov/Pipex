@@ -1,31 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strjoin.c                                       :+:      :+:    :+:   */
+/*   ft_bzero.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aleslie <aleslie@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/10/14 23:10:53 by aleslie           #+#    #+#             */
-/*   Updated: 2021/11/11 21:22:56 by aleslie          ###   ########.fr       */
+/*   Created: 2021/10/14 23:05:58 by aleslie           #+#    #+#             */
+/*   Updated: 2021/10/30 14:58:04 by aleslie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strjoin(char const *s1, char const *s2)
+void	ft_bzero(void *b, size_t len)
 {
-	int		ss1;
-	int		ss2;
-	char	*str;
+	unsigned char	*str;
+	size_t			i;
 
-	if (!s1 || !s2)
-		return (NULL);
-	ss1 = ft_strlen(s1);
-	ss2 = ft_strlen(s2);
-	str = (char *)calloc((ss1 + ss2 + 1), sizeof(char));
-	if (!str)
-		return (NULL);
-	ft_strlcat(str, s1, ss1 + 1);
-	ft_strlcat(&str[ss1], s2, ss2 + 1);
-	return (str);
+	str = (unsigned char *)b;
+	i = 0;
+	while (i < len)
+	{
+		str[i] = '\0';
+		i++;
+	}
 }

@@ -5,68 +5,121 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: aleslie <aleslie@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/10 12:21:27 by aleslie           #+#    #+#             */
-/*   Updated: 2021/11/11 01:37:45 by aleslie          ###   ########.fr       */
+/*   Created: 2021/11/11 14:30:05 by aleslie           #+#    #+#             */
+/*   Updated: 2021/11/11 21:43:43 by aleslie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	main(int argc, char **argv, char *env[])
+char	*ft_collecting_path_cmd(char **path, char *command)
 {
 	int		i;
-	int		fd[2];
-	int		file1;
-	int		file2;
-	char	*cat[3];
-	char	*wc[3];
-	pid_t	pid;
-	
-
-	cat[0] = "/bin/cat";
-	cat[1] = "-e";
-	cat[2] = NULL;
-	wc[0] = "/usr/bin/ws";
-	wc[1] = "-l";
-	wc[2] = NULL;
-	file1 = open("file1", O_RDONLY, 0666);
-	file2 = open("file2", O_CREAT | O_TRUNC | O_WRONLY, 0666);
+	int		valid;
+	char	*dir;
+	char	*full_dir;
 
 	i = 0;
-	while (env[++i])
-		{
-			if (!strncmp("PATH=", env[i], 5))
-				printf("%s", env[i]);
-		}
-	pipe(fd);
-	pid = fork();
-	if (!pid)
+	while (path[i])
 	{
-		dup2(file1, 0);
-		close(file1);
-		close(fd[0]);
-		dup2(fd[1], 1);
-		close(fd[1]);
-		execle(cat[0], (const char *)cat, env);
+		dir = ft_strjoin(path[i], "/");
+		full_dir = ft_strjoin(dir, command);
+		free(dir);
+		valid = access(full_dir, F_OK);
+		if (valid < 0)
+			free(full_dir);
+		else
+			return (full_dir);
+		++i;
 	}
-	else
-	{
-		close(fd[1]);
-		wait(NULL);
-	}
+	return (NULL);
+}
 
+char	**ft_pars_var_environ(char **env)
+{
+	int		i;
+	char	**path;
+
+	i = 0;
+	while (env[i])
+	{
+		if (ft_strncmp(env[i], "PATH=", 5) == 0)
+		{
+			path = ft_split(env[i] + 5, ':');
+			return (path);
+		}
+		++i;
+	}
+	perror("'PATH=' not found");
+	exit(0);
+}
+
+void	ft_child_process(int *pipe_fd, char **argv, char **env)
+{
+	int		file1;
+	char	**path;
+	char	**command;
+	char	*all_file_path;
+
+	file1 = open(argv[1], O_RDONLY);
+	if (file1 < 0)
+	{
+		perror("File not found");
+		exit(0);
+	}
+	dup2(file1, 0); // ввод с файла
+	dup2(pipe_fd[1], 1); // вывод в начало трубы
+	close(pipe_fd[0]); // закрываем конец трубы
+	path = ft_pars_var_environ(env); // Парсим переменное окружение
+	command = ft_split(argv[2], ' ');
+	all_file_path = ft_collecting_path_cmd(path, command[0]);
+	if (!all_file_path)
+		perror("Command not found {ft_child_process}");
+	execve(all_file_path, command, env);
+}
+
+void	ft_parent_process(int *pipe_fd, char **argv, char **env)
+{
+	int		file2;
+	char	**path;
+	char	**command;
+	char	*all_file_path;
+
+	file2 = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (file2 < 0)
+	{
+		perror("File not found");
+		exit(0);
+	}
+	dup2(pipe_fd[0], 0); // ввод с конца трубы
+	dup2(file2, 1); // вывод в файл
+	close(pipe_fd[1]); // закрываем начало трубы
+	path = ft_pars_var_environ(env); // Парсим переменное окружение
+	command = ft_split(argv[3], ' ');
+	all_file_path = ft_collecting_path_cmd(path, command[0]);
+	if (!all_file_path)
+		perror("Command not found {ft_parent_process}");
+	execve(all_file_path, command, env);
+}
+
+int	main(int argc, char **argv, char **env)
+{
+	int		pipe_fd[2];
+	pid_t	pid;
+
+	if (argc != 5)
+		return (0);
+	if (pipe(pipe_fd) == -1)
+		return (0);
 	pid = fork();
-	if (!pid)
+	if (pid == -1)
 	{
-		dup2(file2, 1);
-		close(file2);
-		dup2(fd[0], 0);
-		close(fd[0]);
-		execle(cat[0], (const char *)wc, env);
+		perror("Error creating a new process");
+		return (0);
 	}
+	if (pid == 0)
+		ft_child_process(pipe_fd, argv, env);
 	else
-	{
-		close(fd[0]);
-		wait(NULL);
-	}
+		ft_parent_process(pipe_fd, argv, env);
+	return (0);
 }
