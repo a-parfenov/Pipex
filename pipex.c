@@ -6,7 +6,7 @@
 /*   By: aleslie <aleslie@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/11 14:30:05 by aleslie           #+#    #+#             */
-/*   Updated: 2021/11/11 21:49:20 by aleslie          ###   ########.fr       */
+/*   Updated: 2021/11/12 12:23:58 by aleslie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,10 @@ char	**ft_pars_var_environ(char **env)
 	exit(0);
 }
 
+/*
+** 74 - Ввод с файла, 75 - Вывод в начало трубы
+** 76 - Закрываем конец трубы, 77 - Парсим переменное окружение
+*/
 void	ft_child_process(int *pipe_fd, char **argv, char **env)
 {
 	int		file1;
@@ -67,10 +71,10 @@ void	ft_child_process(int *pipe_fd, char **argv, char **env)
 		perror("File not found");
 		exit(0);
 	}
-	dup2(file1, 0); // Ввод с файла
-	dup2(pipe_fd[1], 1); // Вывод в начало трубы
-	close(pipe_fd[0]); // Закрываем конец трубы
-	path = ft_pars_var_environ(env); // Парсим переменное окружение
+	dup2(file1, 0);
+	dup2(pipe_fd[1], 1);
+	close(pipe_fd[0]);
+	path = ft_pars_var_environ(env);
 	command = ft_split(argv[2], ' ');
 	all_file_path = ft_collecting_path_cmd(path, command[0]);
 	if (!all_file_path)
@@ -78,6 +82,10 @@ void	ft_child_process(int *pipe_fd, char **argv, char **env)
 	execve(all_file_path, command, env);
 }
 
+/*
+** 102 - Ввод с конца трубы, 103 - Вывод в файл
+** 104 - Закрываем начало трубы, 105 - Парсим переменное окружение
+*/
 void	ft_parent_process(int *pipe_fd, char **argv, char **env)
 {
 	int		file2;
@@ -91,10 +99,10 @@ void	ft_parent_process(int *pipe_fd, char **argv, char **env)
 		perror("File not found");
 		exit(0);
 	}
-	dup2(pipe_fd[0], 0); // Ввод с конца трубы
-	dup2(file2, 1); // Вывод в файл
-	close(pipe_fd[1]); // Закрываем начало трубы
-	path = ft_pars_var_environ(env); // Парсим переменное окружение
+	dup2(pipe_fd[0], 0);
+	dup2(file2, 1);
+	close(pipe_fd[1]);
+	path = ft_pars_var_environ(env);
 	command = ft_split(argv[3], ' ');
 	all_file_path = ft_collecting_path_cmd(path, command[0]);
 	if (!all_file_path)
