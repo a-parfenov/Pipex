@@ -1,31 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strjoin.c                                       :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aleslie <aleslie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/10/14 23:10:53 by aleslie           #+#    #+#             */
-/*   Updated: 2021/12/07 22:28:41 by aleslie          ###   ########.fr       */
+/*   Created: 2021/12/08 15:19:40 by aleslie           #+#    #+#             */
+/*   Updated: 2021/12/08 15:25:28 by aleslie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "pipex.h"
 
-char	*ft_strjoin(char const *s1, char const *s2)
+void	error(char *str)
 {
-	int		ss1;
-	int		ss2;
-	char	*str;
-
-	if (!s1 || !s2)
-		return (NULL);
-	ss1 = ft_strlen(s1);
-	ss2 = ft_strlen(s2);
-	str = (char *)ft_calloc((ss1 + ss2 + 1), sizeof(char));
-	if (!str)
-		return (NULL);
-	ft_strlcat(str, s1, ss1 + 1);
-	ft_strlcat(&str[ss1], s2, ss2 + 1);
-	return (str);
+	perror(str);
+	exit(0);
 }

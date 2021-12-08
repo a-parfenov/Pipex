@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aleslie <aleslie@student.21-school.ru>     +#+  +:+       +#+        */
+/*   By: aleslie <aleslie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/11 14:30:05 by aleslie           #+#    #+#             */
-/*   Updated: 2021/11/12 13:54:39 by aleslie          ###   ########.fr       */
+/*   Updated: 2021/12/08 15:07:24 by aleslie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ char	**pars_var_environ(char **env)
 		if (ft_strncmp(env[i], "PATH=", 5) == 0)
 		{
 			path = ft_split(env[i] + 5, ':');
+			if (!path)
+				error("Error_7: split");
 			return (path);
 		}
 		++i;
@@ -54,57 +56,57 @@ char	**pars_var_environ(char **env)
 	exit(0);
 }
 
-/*
-** 74 - Ввод с файла, 75 - Вывод в начало трубы
-** 76 - Закрываем конец трубы, 77 - Парсим переменное окружение
-*/
 void	child_process(int *pipe_fd, char **argv, char **env)
 {
 	int		file1;
 	char	**path;
 	char	**command;
 	char	*all_file_path;
+	int		i;
 
+	i = -1;
 	file1 = open(argv[1], O_RDONLY);
 	if (file1 < 0)
-	{
-		perror("File not found");
-		exit(0);
-	}
+		error("File not found");
 	dup2(file1, 0);
 	dup2(pipe_fd[1], 1);
 	close(pipe_fd[0]);
 	path = pars_var_environ(env);
 	command = ft_split(argv[2], ' ');
+	if (!command)
+		error("Error_3: split");
 	all_file_path = collecting_path_cmd(path, command[0]);
+	while (path[++i])
+		free(path[i]);
+	free(path);
 	if (!all_file_path)
 		perror("Command not found {child_process}");
 	execve(all_file_path, command, env);
 }
 
-/*
-** 102 - Ввод с конца трубы, 103 - Вывод в файл
-** 104 - Закрываем начало трубы, 105 - Парсим переменное окружение
-*/
 void	parent_process(int *pipe_fd, char **argv, char **env)
 {
 	int		file2;
 	char	**path;
 	char	**command;
 	char	*all_file_path;
+	int		i;
 
+	i = -1;
 	file2 = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (file2 < 0)
-	{
-		perror("File not found");
-		exit(0);
-	}
+		error("File not found");
 	dup2(pipe_fd[0], 0);
 	dup2(file2, 1);
 	close(pipe_fd[1]);
 	path = pars_var_environ(env);
 	command = ft_split(argv[3], ' ');
+	if (!command)
+		error("Error_6: split");
 	all_file_path = collecting_path_cmd(path, command[0]);
+	while (path[++i])
+		free(path[i]);
+	free(path);
 	if (!all_file_path)
 		perror("Command not found {ft_parent_process}");
 	execve(all_file_path, command, env);

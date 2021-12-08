@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aleslie <aleslie@student.21-school.ru>     +#+  +:+       +#+        */
+/*   By: aleslie <aleslie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/25 18:06:58 by aleslie           #+#    #+#             */
-/*   Updated: 2021/11/12 13:55:21 by aleslie          ###   ########.fr       */
+/*   Updated: 2021/12/08 15:09:34 by aleslie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <fcntl.h>
+
+void	error(char *str);
 
 char	*collecting_path_cmd(char **path, char *command);
 char	**pars_var_environ(char **env);
